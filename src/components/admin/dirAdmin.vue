@@ -512,7 +512,7 @@
         } else {
           this.currentPage=Number(json.pageIndex)
           this.total=Number(json.recordCount)
-          this.userTableList=json.data
+          this.adminTableList=json.data
         }
 
       }).catch(err=>{
