@@ -8,9 +8,10 @@ import ElementUI from 'element-ui';
 import qs from 'qs';
 import App from './App';
 import Promise from 'es6-promise'
+Promise.polyfill()//兼容ie
 import VueClipboard from 'vue-clipboard2'
 Vue.use(VueClipboard)
-Promise.polyfill()
+
 import axios from 'axios';
 axios.defaults.baseURL = process.env.API_ROOT;
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
