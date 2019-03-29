@@ -65,7 +65,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="item in adminTableList">
+            <tr v-for="item in adminTableList" :key="item">
               <td>{{item.dirName||'-'}}</td>
               <td>{{item.host||'-'}}</td>
               <td>{{item.fileServer||'-'}}</td>
