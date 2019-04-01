@@ -77,7 +77,7 @@
                 </div>
                 <div class="editListBox">
                   <ul>
-                    <li class="clearFloat" v-for="(item,index) in editList">
+                    <li class="clearFloat" v-for="(item,index) in editList" :key="item.Name">
                       <span class="fl">{{item.Name}}</span>
                       <i v-if="index==0?false:true" class="fr el-icon-close" @click="removeEditUser(index)"></i>
                     </li>
@@ -91,7 +91,7 @@
                 </div>
                 <div class="editListBox">
                   <ul>
-                    <li class="clearFloat" v-for="(item,index) in readOnlyList">
+                    <li class="clearFloat" v-for="(item,index) in readOnlyList" :key="item.Name">
                       <span class="fl">{{item.Name}}</span>
                       <i class="fr el-icon-close" @click="removeReadUser(index)"></i>
                     </li>
@@ -119,7 +119,7 @@
       </div>
       <el-checkbox-group v-model="cacheArr">
         <ul id="ou_list" >
-          <li v-for="city in checkedArr">
+          <li v-for="city in checkedArr" :key="city.Name">
             <el-checkbox  :label="city" >{{city.Name}}</el-checkbox>
           </li>
         </ul>

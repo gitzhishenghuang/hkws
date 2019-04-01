@@ -8,7 +8,7 @@
         <el-aside width="230px" style="border-right: 1px solid #ccc">
           <div class="toggleList">
             <ul>
-              <li @click="addClass(index)" :class="{now:now===index}" v-for="(item,index) in liList">{{item}}</li>
+              <li @click="addClass(index)" :class="{now:now===index}" v-for="(item,index) in liList" :key="item">{{item}}</li>
             </ul>
           </div>
         </el-aside>

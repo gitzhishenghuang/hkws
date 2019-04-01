@@ -19,7 +19,7 @@
             </div>
           </el-aside>
           <el-main>
-            <div style="margin-bottom: 10px;">
+            <!-- <div style="margin-bottom: 10px;">
               文件夹名称　<input class="dirName" v-model.trim="dirName" type="text" placeholder="请输入文件夹名称">
               文件夹大小　<el-select v-model="spaceSize" placeholder="请选择">
                             <el-option
@@ -29,8 +29,8 @@
                               :value="item.Space">
                             </el-option>
                           </el-select>
-            </div>
-            <div style="margin-bottom: 15px;">
+            </div> -->
+            <!-- <div style="margin-bottom: 15px;">
               创建时间　<el-date-picker
                           v-model="dateValue"
                           type="daterange"
@@ -51,7 +51,7 @@
                         </el-option>
                       </el-select>
               <el-button style="margin-left: 32px" @click="GetFolderList('reset')">搜索</el-button>
-            </div>
+            </div> -->
             <div>
               <div style="margin-bottom: 5px;">
                 <a @click="addDir" class="addDir" href="javascript:void (0);">
@@ -363,7 +363,7 @@ export default {
             return false;
           }
         } else {
-          this.GetFolderList()
+          this.QueryAllFolderList()
           this.renewalCancel()
         }
 
@@ -541,7 +541,7 @@ export default {
     newSave(val){
       if(val=='success'){
         this.showNewDir=false;
-        this.GetFolderList();
+        this.QueryAllFolderList();
       }
     },
     editSave(val){
