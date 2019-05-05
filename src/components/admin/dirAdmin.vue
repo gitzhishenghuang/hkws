@@ -70,6 +70,7 @@
                 <thead>
                 <tr>
                   <td width="13%">文件夹名称</td>
+                  <td width="13%"><i></i> 共享路径</td>
                   <td width="10%"><i></i> 文件夹大小</td>
                   <td width="10%"><i></i> 所属人</td>
                   <td width="15%"><i></i> 文件服务器</td>
@@ -80,8 +81,9 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="(item,index) in adminTableList" :key="item">
+                <tr v-for="(item,index) in adminTableList" :key="item.Name">
                   <td>{{item.Name||'-'}}</td>
+                  <td>{{item.Path||'-'}}</td>
                   <td>{{item.Space?item.Space+'GB':''||'-'}}</td>
                   <td>{{item.UserName||'-'}}</td>
                   <td>{{item.FileServerName||'-'}}</td>
@@ -89,8 +91,8 @@
                   <td>{{item.ModifyTime||'-'}}</td>
                   <td>{{item.Validity||'-'}}</td>
                   <td>
-                    <a href="javascript:void(0)" @click="showLookOverDiv(item.ID)">查看</a>
-                    <a href="javascript:void(0)" @click="editFolder(item.ID)">| 编辑</a>
+                    <!--<a href="javascript:void(0)" @click="showLookOverDiv(item.ID)">查看</a>-->
+                    <a href="javascript:void(0)" @click="editFolder(item.ID)">编辑</a>
                     <a href="javascript:void(0)" @click="DeleteFolder(item.ID,index)">| 删除</a>
                   </td>
                 </tr>
@@ -630,9 +632,10 @@
     border-left: 1px solid #665C66;
   }
   .userTable td{
-    height: 30px;
-    line-height: 30px;
-    padding: 5px 20px;
+    /*height: 30px;*/
+    /*line-height: 30px;*/
+    padding: 10px 20px;
+    line-height: 1.4;
     padding-right: 0;
     background: #fff;
   }

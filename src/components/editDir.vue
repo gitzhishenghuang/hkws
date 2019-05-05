@@ -1,6 +1,6 @@
 <template>
-  <div class="bgModel">
-    <div class="box" v-loading="loading">
+  <div class="bgModel" v-loading="loading">
+    <div class="box" >
       <div class="header">
         <i class="el-icon-close fr close" @click="cancel"></i>
         文件夹属性
@@ -27,10 +27,10 @@
                 </el-col>
               </el-row>
               <el-row style="margin:5px 0">
-                <el-col :span="7" class="text-right">授权编号</el-col>
+                <el-col :span="7" class="text-right">授权</el-col>
                 <el-col :span="17">
                   <el-col :span="17">
-                    <input type="text" v-model="dirInfo.AccreditID" readonly>
+                    <input type="text" v-model="dirInfo.AccreditName" readonly>
                   </el-col>
                 </el-col>
               </el-row>
@@ -112,9 +112,9 @@
       <div class="header_input" @keydown.enter="getUserListByKeyWord">
         <el-input
           placeholder="请输入内容"
-          prefix-icon="el-icon-search"
           v-model="searchInp"
           clearable>
+          <el-button slot="append" @click="getUserListByKeyWord" icon="el-icon-search"></el-button>
         </el-input>
       </div>
       <el-checkbox-group v-model="cacheArr">

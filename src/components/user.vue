@@ -6,12 +6,12 @@
         </el-header>
         <el-container style="margin-top: 5px;">
           <el-aside width="230px" style="border-right: 1px solid #ccc">
-            <div class="progress clearFloat">
+            <!--<div class="progress clearFloat">
               <el-progress :text-inside="true" :stroke-width="18" :percentage="percentage" status="exception"></el-progress>
               <div class="fr">
                 {{UseSpace}}G/{{SumSpace}}G
               </div>
-            </div>
+            </div>-->
             <div class="toggleList">
               <ul>
                 <li @click="addClass(index)" :class="{now:now===index}" v-for="(item,index) in liList" :key="item">{{item}}</li>
@@ -62,26 +62,28 @@
                 <table class="userTable">
                   <thead>
                     <tr>
-                      <td width="15%">文件夹名称</td>
-                      <td width="10%"><i></i> 使用情况</td>
+                      <td width="13%">文件夹名称</td>
+                      <td width="13%"><i></i>共享路径</td>
+                      <td width="9%"><i></i> 使用情况</td>
                       <td width="15%"><i></i> 创建时间</td>
                       <td width="15%"><i></i> 修改时间</td>
-                      <td width="15%"><i></i> 过期时间</td>
-                      <td width="10%"><i></i> 有效期</td>
-                      <td width="20%"><i></i> 操作</td>
+                      <td width="14%"><i></i> 过期时间</td>
+                      <td width="8%"><i></i> 有效期</td>
+                      <td width="14%"><i></i> 操作</td>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="(item,index) in userTableList" :key="item.ID">
                       <td>{{item.Name||'-'}}</td>
+                      <td>{{item.Path||'-'}}</td>
                       <td>{{item.SpaceUse||'-'}}</td>
                       <td>{{item.CreateTime||'-'}}</td>
                       <td>{{item.ModifyTime||'-'}}</td>
                       <td>{{item.DueToTime||'-'}}</td>
                       <td>{{item.Validity||'-'}}</td>
                       <td>
-                        <a href="javascript:void(0)" @click="showLookOverDiv(item.ID)">查看</a>
-                        <a href="javascript:void(0)" @click="editFolder(item.ID)">| 编辑</a>
+                        <!--<a href="javascript:void(0)" @click="showLookOverDiv(item.ID)">查看</a>-->
+                        <a href="javascript:void(0)" @click="editFolder(item.ID)">编辑</a>
                         <a href="javascript:void(0)" @click="DeleteFolder(item.ID,index)">| 删除</a>
                         <a href="javascript:void(0)" @click="showRenewalDiv(item.ID,item.Name,item.Validity,item.DueToTime,item.FileServerName)">| 续期</a>
                       </td>
@@ -185,12 +187,12 @@
 export default {
   name: 'user',
   computed:{
-    percentage(){
+    /*percentage(){
       if(!this.UseSpace){
         return 0
       }
       return Math.round(this.UseSpace/this.SumSpace)
-    }
+    }*/
   },
   mounted(){
     var date=new Date();
@@ -225,8 +227,8 @@ export default {
     }).catch(err=>{
       this.$message.error('数据错误');
     });
-    this.UseSpace=Storage.get('LoginInfo').UseSpace;
-    this.SumSpace=Storage.get('LoginInfo').SumSpace;
+    //this.UseSpace=Storage.get('LoginInfo').UseSpace;
+    //this.SumSpace=Storage.get('LoginInfo').SumSpace;
     this.QueryAllFolderList();
   },
   data(){
@@ -616,13 +618,13 @@ export default {
     border-left: 1px solid #665C66;
   }
   .userTable td{
-    height: 30px;
-    line-height: 30px;
-    padding: 5px 20px;
+    line-height: 1.4;
+    padding: 10px 5px 10px 20px;
     background: #fff;
   }
 .userTable tbody td{
   border-top: #F2F2F3;
+
 }
 
   /*续期申请 、查看*/

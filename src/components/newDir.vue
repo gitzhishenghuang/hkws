@@ -1,6 +1,6 @@
 <template>
-    <div class="bgModel">
-      <div class="box" v-loading="loading">
+    <div class="bgModel" v-loading="loading">
+      <div class="box" >
         <div class="header">
           <i class="el-icon-close fr close" @click="cancel"></i>
           文件夹属性
@@ -21,20 +21,22 @@
                   </el-col>
                 </el-row>
                 <el-row>
-                  <el-col :span="7" class="text-right">授权编号</el-col>
+                  <el-col :span="7" class="text-right">选择授权</el-col>
                   <el-col :span="17">
-                    <el-select @change="linkage(codeValue)" v-model="codeValue" placeholder="请选择" style="width: 270px">
+                    <el-select @change="linkage(codeValue)" value-key="AccreditID" v-model="codeValue" placeholder="请选择" style="width: 270px">
                       <el-option
                         v-for="item in authOptions"
                         :key="item.AccreditID"
-                        :label="item.AccreditID"
-                        :value="item">
+                        :label="item.AccreditName"
+                        :value="item"
+                        >
+                        <!--:value="item.AccreditID+';'+item.Name+';'+item.FileSpace"-->
                       </el-option>
                     </el-select>
                   </el-col>
                 </el-row>
                 <el-row style="margin:5px 0">
-                  <el-col :span="7" class="text-right">选择文件服务器</el-col>
+                  <el-col :span="7" class="text-right">文件服务器</el-col>
                   <el-col :span="17">
                     <input type="text" v-model="fileServerName" readonly>
                   </el-col>
@@ -118,9 +120,9 @@
         <div class="header_input" @keydown.enter="getUserListByKeyWord">
           <el-input
             placeholder="请输入内容"
-            prefix-icon="el-icon-search"
             v-model="searchInp"
             clearable>
+            <el-button slot="append" @click="getUserListByKeyWord" icon="el-icon-search"></el-button>
           </el-input>
         </div>
         <el-checkbox-group v-model="cacheArr">
@@ -151,6 +153,10 @@
           this.showSuccess=false
         },
         codeValue(n){
+          if(this.dirName==''){
+            this.isSaveBtn=true
+            return
+          }
           this.isSaveBtn=false
         }
       },
@@ -360,6 +366,11 @@
           this.fileServerName=obj.Name
           this.sizeValue=obj.FileSpace
         },
+        /*linkage(str){
+          var arr=str.split(';');
+          this.fileServerName=arr[1]
+          this.sizeValue=arr[2]
+        },*/
 
         //检查名称
         inspectName(){
