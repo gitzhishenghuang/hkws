@@ -77,7 +77,7 @@
                 </div>
                 <div class="editListBox">
                   <ul>
-                    <li class="clearFloat" v-for="(item,index) in editList" :key="item.Name">
+                    <li class="clearFloat" v-for="(item,index) in editList" :key="index">
                       <span class="fl">{{item.Name}}</span>
                       <i v-if="index==0?false:true" class="fr el-icon-close" @click="removeEditUser(index)"></i>
                     </li>
@@ -91,7 +91,7 @@
                 </div>
                 <div class="editListBox">
                   <ul>
-                    <li class="clearFloat" v-for="(item,index) in readOnlyList" :key="item.Name">
+                    <li class="clearFloat" v-for="(item,index) in readOnlyList" :key="index">
                       <span class="fl">{{item.Name}}</span>
                       <i class="fr el-icon-close" @click="removeReadUser(index)"></i>
                     </li>
@@ -254,20 +254,21 @@
           opr:'CheckFolderName'
         }).then(res=>{
           var json=res.data;
-          Storage.setKey(json.key)
+          
           if (json.result.toLowerCase() == 'false') {
-            if (json.errmsg == '超时') {
-              this.$alert('key超时','超时', {
-                confirmButtonText: '确定',
-                callback: action => {
-                  this.$router.push('/login')
-                }
-              });
-              return false;
+            if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
+                this.$alert('与服务器断开连接',json.errmsg, {
+                  confirmButtonText: '确定',
+                  callback: action => {
+                    this.$router.push('/login')
+                  }
+                });
+                return false;
             } else if (json.errmsg) {
               this.$message.warning(json.errmsg)
               return false;
             } else {
+              Storage.setKey(json.key)
               this.$message.warning('数据异常')
               return false;
             }
@@ -301,17 +302,19 @@
         }).then(res=>{
           var json=res.data;
           this.loading=false
-          Storage.setKey(json.key)
           if (json.result.toLowerCase() == 'false') {
-            if (json.errmsg == '超时') {
-              this.$alert('key超时','超时', {
-                confirmButtonText: '确定',
-                callback: action => {
-                  this.$router.push('/login')
-                }
-              });
-              return false;
-            } else if (json.errmsg) {
+            if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
+                this.$alert('与服务器断开连接',json.errmsg, {
+                  confirmButtonText: '确定',
+                  callback: action => {
+                    this.$router.push('/login')
+                  }
+                });
+                return false;
+              } else if (json.errmsg) {
+            this.$message.warning(json.errmsg)
+            return false;
+          } else if (json.errmsg) {
               this.$message.warning(json.errmsg)
               return false;
             } else {
@@ -319,6 +322,7 @@
               return false;
             }
           } else {
+            Storage.setKey(json.key)
             this.checkedArr=json.data
           }
 
@@ -336,24 +340,28 @@
           FolderID:this.FolderID,
           Space:this.dirInfo.Space,
           Desc:this.dirInfo.Desc,
-          Permissions:JSON.stringify({Editor:this.editList,Reader:this.readOnlyList}),
+          //Permissions:JSON.stringify({Editor:this.editList,Reader:this.readOnlyList}),
           Account:this.people?this.dirInfo.UserAccount:Storage.get('LoginInfo').Account,
           LoginUser:Storage.get('LoginInfo').Account,
           opr:'ModifyFolder'
-        }).then(res=>{
+        },
+        {Editor:this.editList,
+          Reader:this.readOnlyList}).then(res=>{
           var json=res.data;
           this.loading=false
-          Storage.setKey(json.key)
           if (json.result.toLowerCase() == 'false') {
-            if (json.errmsg == '超时') {
-              this.$alert('key超时','超时', {
-                confirmButtonText: '确定',
-                callback: action => {
-                  this.$router.push('/login')
-                }
-              });
-              return false;
-            } else if (json.errmsg) {
+            if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
+                this.$alert('与服务器断开连接',json.errmsg, {
+                  confirmButtonText: '确定',
+                  callback: action => {
+                    this.$router.push('/login')
+                  }
+                });
+                return false;
+              } else if (json.errmsg) {
+            this.$message.warning(json.errmsg)
+            return false;
+          } else if (json.errmsg) {
               this.$message.warning(json.errmsg)
               return false;
             } else {
@@ -361,6 +369,7 @@
               return false;
             }
           } else {
+            Storage.setKey(json.key)
             this.$emit('editSaveFn','success')
           }
 
@@ -371,7 +380,6 @@
     },
 
     mounted(){
-      this.sizeValue=this.optionsSize[0].Space
       if(this.type=='admin'){
         this.people=true
       }
@@ -382,17 +390,16 @@
         opr:'GetFolderInfo'
       }).then(res=>{
         var json=res.data;
-        Storage.setKey(json.key)
         if (json.result.toLowerCase() == 'false') {
-          if (json.errmsg == '超时') {
-            this.$alert('key超时','超时', {
-              confirmButtonText: '确定',
-              callback: action => {
-                this.$router.push('/login')
-              }
-            });
-            return false;
-          } else if (json.errmsg) {
+          if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
+                this.$alert('与服务器断开连接',json.errmsg, {
+                  confirmButtonText: '确定',
+                  callback: action => {
+                    this.$router.push('/login')
+                  }
+                });
+                return false;
+              } else if (json.errmsg) {
             this.$message.warning(json.errmsg)
             return false;
           } else {
@@ -400,9 +407,11 @@
             return false;
           }
         } else {
+          Storage.setKey(json.key)
           this.dirInfo=json
           this.editList=json.Permissions.Editor
           this.readOnlyList=json.Permissions.Reader
+          this.sizeValue=Number(json.Space)
         }
 
       }).catch(err=>{

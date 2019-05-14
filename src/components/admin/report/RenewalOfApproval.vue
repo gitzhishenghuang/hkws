@@ -113,7 +113,7 @@
       })]).then(this.$http.spread((FileServerList,GetSpaceList)=>{
         this.loading=false
         var json1=FileServerList.data;
-        Storage.setKey(json1.key)
+        //Storage.setKey(json1.key)
         if (json1.result.toLowerCase() == 'false') {
           if (json1.errmsg == '超时') {
             this.$alert('key超时','超时', {
@@ -136,7 +136,7 @@
         }
 
         var json2=GetSpaceList.data;
-        Storage.setKey(json2.key)
+        //Storage.setKey(json2.key)
         if (json2.result.toLowerCase() == 'false') {
           if (json2.errmsg == '超时') {
             this.$alert('key超时','超时', {
@@ -234,11 +234,9 @@
         }).then(res=>{
           this.loading=false;
           var json=res.data;
-          console.log(res);
-          Storage.setKey(json.key)
           if (json.result.toLowerCase() == 'false') {
-            if (json.errmsg == '超时') {
-              this.$alert('key超时','超时', {
+            if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
+              this.$alert('与服务器断开连接',json.errmsg, {
                 confirmButtonText: '确定',
                 callback: action => {
                   this.$router.push('/login')
@@ -253,6 +251,7 @@
               return false;
             }
           } else {
+            Storage.setKey(json.key)
             this.currentPage=Number(json.pageIndex)
             this.total=Number(json.recordCount)
             this.adminTableList=json.data

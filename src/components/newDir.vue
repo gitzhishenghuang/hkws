@@ -85,7 +85,7 @@
                   </div>
                   <div class="editListBox">
                     <ul>
-                      <li class="clearFloat" v-for="(item,index) in editList" :key="item.Name">
+                      <li class="clearFloat" v-for="(item,index) in editList" :key="index">
                         <span class="fl">{{item.Name}}</span>
                         <i v-if="index==0?false:true" class="fr el-icon-close" @click="removeEditUser(index)"></i>
                       </li>
@@ -99,7 +99,7 @@
                   </div>
                   <div class="editListBox">
                     <ul>
-                      <li class="clearFloat" v-for="(item,index) in readOnlyList" :key="item.Name"> 
+                      <li class="clearFloat" v-for="(item,index) in readOnlyList" :key="index"> 
                         <span class="fl">{{item.Name}}</span>
                         <i class="fr el-icon-close" @click="removeReadUser(index)"></i>
                       </li>
@@ -127,7 +127,7 @@
         </div>
         <el-checkbox-group v-model="cacheArr">
           <ul id="ou_list" >
-            <li v-for="city in checkedArr" :key="city.Name">
+            <li v-for="(city,index) in checkedArr" :key="index">
               <el-checkbox  :label="city" >{{city.Name}}</el-checkbox>
             </li>
           </ul>
@@ -385,10 +385,9 @@
             opr:'CheckFolderName'
           }).then(res=>{
             var json=res.data;
-            Storage.setKey(json.key)
             if (json.result.toLowerCase() == 'false') {
-              if (json.errmsg == '超时') {
-                this.$alert('key超时','超时', {
+              if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
+                this.$alert('与服务器断开连接',json.errmsg, {
                   confirmButtonText: '确定',
                   callback: action => {
                     this.$router.push('/login')
@@ -403,6 +402,7 @@
                 return false;
               }
             } else {
+              Storage.setKey(json.key)
               if(json.result.toLowerCase()=='true'){
                 this.showSuccess=true
                 this.showError=false
@@ -432,10 +432,9 @@
           }).then(res=>{
             var json=res.data;
             this.loading=false
-            Storage.setKey(json.key)
             if (json.result.toLowerCase() == 'false') {
-              if (json.errmsg == '超时') {
-                this.$alert('key超时','超时', {
+              if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
+                this.$alert('与服务器断开连接',json.errmsg, {
                   confirmButtonText: '确定',
                   callback: action => {
                     this.$router.push('/login')
@@ -450,6 +449,7 @@
                 return false;
               }
             } else {
+              Storage.setKey(json.key)
               this.checkedArr=json.data
             }
 
@@ -460,8 +460,7 @@
 
         //新建文件夹保存
         saveDir(){
-          this.loading=true
-          this.$http.post('',{
+          console.log({
             strCurrentTime:Storage.get('LoginInfo').key,
             FolderName:this.dirName,
             AccreditID:this.codeValue.AccreditID,
@@ -472,12 +471,28 @@
             Account:Storage.get('LoginInfo').Account,
             LoginUser:Storage.get('LoginInfo').Account,
             opr:'AddFolder'
-          }).then(res=>{
+          })
+          this.loading=true
+          this.$http.post('',{
+            strCurrentTime:Storage.get('LoginInfo').key,
+            FolderName:this.dirName,
+            AccreditID:this.codeValue.AccreditID,
+            Space:this.sizeValue,
+            Validity:this.dayValue,
+            Desc:this.Desc,
+           //Permissions:{Editor:this.editList,Reader:this.readOnlyList},
+            //Permissions:JSON.stringify({Editor:this.editList,Reader:this.readOnlyList}),
+            Account:Storage.get('LoginInfo').Account,
+            LoginUser:Storage.get('LoginInfo').Account,
+            opr:'AddFolder'
+          },
+          {Editor:this.editList,
+          Reader:this.readOnlyList}).then(res=>{
             var json=res.data;
             this.loading=false
             if (json.result.toLowerCase() == 'false') {
-              if (json.errmsg == '超时') {
-                this.$alert('key超时','超时', {
+              if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
+                this.$alert('与服务器断开连接',json.errmsg, {
                   confirmButtonText: '确定',
                   callback: action => {
                     this.$router.push('/login')
@@ -489,9 +504,10 @@
                 return false;
               } else {
                 this.$message.warning('数据异常')
-                return false;
+                return 
               }
             } else {
+              Storage.setKey(json.key)
               this.$emit('successFn','success')
             }
 
@@ -510,16 +526,15 @@
           opr:'GetAccreditIDList'
         }).then(res=>{
           var json=res.data;
-          Storage.setKey(json.key)
           if (json.result.toLowerCase() == 'false') {
-            if (json.errmsg == '超时') {
-              this.$alert('key超时','超时', {
-                confirmButtonText: '确定',
-                callback: action => {
-                  this.$router.push('/login')
-                }
-              });
-              return false;
+            if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
+            this.$alert('与服务器断开连接',json.errmsg, {
+              confirmButtonText: '确定',
+              callback: action => {
+                this.$router.push('/login')
+              }
+            });
+            return false;
             } else if (json.errmsg) {
               this.$message.warning(json.errmsg)
               return false;
@@ -528,6 +543,7 @@
               return false;
             }
           } else {
+            Storage.setKey(json.key);
             this.authOptions=json.data
           }
 

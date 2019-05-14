@@ -4,7 +4,7 @@
       <el-header>
         <VHeader></VHeader>
       </el-header>
-      <el-container style="margin-top: 5px;">
+      <el-container style="margin-top: 5px;max-height:100%;overflow:auto">
         <el-aside width="230px" style="border-right: 1px solid #ccc">
         </el-aside>
         <el-main>
@@ -41,18 +41,18 @@
               <table class="userTable">
                 <thead>
                 <tr>
-                  <td width="5%">序号</td>
-                  <td width="10%"><i></i> 操作者</td>
-                  <td width="15%"><i></i> IP</td>
+                  <td width="4%" style="padding-left:0;text-align:center">序号</td>
+                  <td width="11%"><i></i> 操作者</td>
+                  <td width="13%"><i></i> IP</td>
                   <td width="15%"><i></i> 操作时间</td>
-                  <td width="8%"><i></i> 操作对象</td>
+                  <td width="10%"><i></i> 操作对象</td>
                   <td width="39%"><i></i> 操作描述</td>
                   <td width="8%"><i></i> 操作结果</td>
                   <!--<td width="10%"><i></i> 操作</td>-->
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="(item,index) in logTableList">
+                <tr v-for="(item,index) in logTableList" :key="index">
                   <td>{{item.序号||'-'}}</td>
                   <td>{{item.操作者||'-'}}</td>
                   <td>{{item.IP||'-'}}</td>
@@ -178,16 +178,16 @@
         }).then(res=>{
           this.loading=false;
           var json=res.data;
-          Storage.setKey(json.key)
+          
           if (json.result.toLowerCase() == 'false') {
-            if (json.errmsg == '超时') {
-              this.$alert('key超时','超时', {
-                confirmButtonText: '确定',
-                callback: action => {
-                  this.$router.push('/login')
-                }
-              });
-              return false;
+            if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
+                this.$alert('与服务器断开连接',json.errmsg, {
+                  confirmButtonText: '确定',
+                  callback: action => {
+                    this.$router.push('/login')
+                  }
+                });
+                return false;
             } else if (json.errmsg) {
               this.$message.warning(json.errmsg)
               return false;
@@ -196,6 +196,7 @@
               return false;
             }
           } else {
+            Storage.setKey(json.key)
             this.logTableList=json.data
             this.total=Number(json.recordCount)
           }

@@ -36,7 +36,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="(item,index) in authTableList">
+                <tr v-for="(item,index) in authTableList" :key="item.SN">
                   <td>{{item.SN||'-'}}</td>
                   <td>{{item.Name||'-'}}</td>
                   <td>{{item.Account||'-'}}</td>
@@ -87,7 +87,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="item in findAuthList">
+                <tr v-for="item in findAuthList" :key="item.UPN">
                   <td><input type="radio" name="Auth"  @click="selectRadio(item.AccreditID,item.Account,item.Name)"/></td>
                   <td>{{item.Name}}</td>
                   <td>{{item.UPN}}</td>
@@ -175,12 +175,17 @@
         opr:'GetFolderServer'
       }).then(res=>{
         var json=res.data;
-        Storage.setKey(json.key)
+        //Storage.setKey(json.key)
         if (json.result.toLowerCase() == 'false') {
-          if (json.errmsg == '超时') {
-            this.$message.warning('超时')
-            return false;
-          } else if (json.errmsg) {
+          if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
+                this.$alert('与服务器断开连接',json.errmsg, {
+                  confirmButtonText: '确定',
+                  callback: action => {
+                    this.$router.push('/login')
+                  }
+                });
+                return false;
+            } else if (json.errmsg) {
             this.$message.warning(json.errmsg)
             return false;
           } else {
@@ -201,12 +206,17 @@
         opr:'GetSpaceList'
       }).then(res=>{
         var json=res.data;
-        Storage.setKey(json.key)
+        //Storage.setKey(json.key)
         if (json.result.toLowerCase() == 'false') {
-          if (json.errmsg == '超时') {
-            this.$message.warning('超时')
-            return false;
-          } else if (json.errmsg) {
+          if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
+                this.$alert('与服务器断开连接',json.errmsg, {
+                  confirmButtonText: '确定',
+                  callback: action => {
+                    this.$router.push('/login')
+                  }
+                });
+                return false;
+            } else if (json.errmsg) {
             this.$message.warning(json.errmsg)
             return false;
           } else {
@@ -324,10 +334,10 @@
             opr:'AddUserImpower'
           }).then(res=>{
             var json=res.data;
-            Storage.setKey(json.key)
+            
             if (json.result.toLowerCase() == 'false') {
-              if (json.errmsg == '超时') {
-                this.$alert('key超时','超时', {
+              if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
+                this.$alert('与服务器断开连接',json.errmsg, {
                   confirmButtonText: '确定',
                   callback: action => {
                     this.$router.push('/login')
@@ -342,6 +352,7 @@
                 return false;
               }
             } else {
+              Storage.setKey(json.key)
               this.QueryUserImpower()
               this.isShowAdd=false
               this.isShowNewAuth=false
@@ -359,10 +370,9 @@
             opr:'UpdateUserImpower'
           }).then(res=>{
             var json=res.data;
-            Storage.setKey(json.key)
             if (json.result.toLowerCase() == 'false') {
-              if (json.errmsg == '超时') {
-                this.$alert('key超时','超时', {
+              if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
+                this.$alert('与服务器断开连接',json.errmsg, {
                   confirmButtonText: '确定',
                   callback: action => {
                     this.$router.push('/login')
@@ -377,6 +387,7 @@
                 return false;
               }
             } else {
+              Storage.setKey(json.key)
               this.QueryUserImpower()
               this.isShowAdd=false
             }
@@ -402,16 +413,15 @@
         }).then(res=>{
           this.loading=false;
           var json=res.data;
-          Storage.setKey(json.key)
           if (json.result.toLowerCase() == 'false') {
-            if (json.errmsg == '超时') {
-              this.$alert('key超时','超时', {
-                confirmButtonText: '确定',
-                callback: action => {
-                  this.$router.push('/login')
-                }
-              });
-              return false;
+            if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
+                this.$alert('与服务器断开连接',json.errmsg, {
+                  confirmButtonText: '确定',
+                  callback: action => {
+                    this.$router.push('/login')
+                  }
+                });
+                return false;
             } else if (json.errmsg) {
               this.$message.warning(json.errmsg)
               return false;
@@ -420,6 +430,7 @@
               return false;
             }
           } else {
+            Storage.setKey(json.key)
             this.findAuthList=json.data;
             this.btnAble=true
           }
@@ -441,16 +452,15 @@
         }).then(res=>{
           this.loading=false;
           var json=res.data;
-          Storage.setKey(json.key)
           if (json.result.toLowerCase() == 'false') {
-            if (json.errmsg == '超时') {
-              this.$alert('key超时','超时', {
-                confirmButtonText: '确定',
-                callback: action => {
-                  this.$router.push('/login')
-                }
-              });
-              return false;
+            if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
+                this.$alert('与服务器断开连接',json.errmsg, {
+                  confirmButtonText: '确定',
+                  callback: action => {
+                    this.$router.push('/login')
+                  }
+                });
+                return false;
             } else if (json.errmsg) {
               this.$message.warning(json.errmsg)
               return false;
@@ -459,6 +469,7 @@
               return false;
             }
           } else {
+            Storage.setKey(json.key)
             this.authTableList=json.data;
             this.total=Number(json.recordCount)
           }
@@ -494,10 +505,10 @@
             opr:'DeleteUserImpower'
           }).then(res=>{
             var json=res.data;
-            Storage.setKey(json.key)
+            
             if (json.result.toLowerCase() == 'false') {
-              if (json.errmsg == '超时') {
-                this.$alert('key超时','超时', {
+              if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
+                this.$alert('与服务器断开连接',json.errmsg, {
                   confirmButtonText: '确定',
                   callback: action => {
                     this.$router.push('/login')
@@ -512,6 +523,7 @@
                 return false;
               }
             } else {
+              Storage.setKey(json.key)
               this.authTableList.splice(index,1)
               this.total--
               this.$message({

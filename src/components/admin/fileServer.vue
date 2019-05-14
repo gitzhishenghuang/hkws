@@ -33,7 +33,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="(item,index) in serverTableList">
+                <tr v-for="(item,index) in serverTableList" :key="item.Name">
                   <td>{{item.Name||'-'}}</td>
                   <td>{{item.Path||'-'}}</td>
                   <td>
@@ -187,16 +187,16 @@
         }).then(res=>{
           this.loading=false;
           var json=res.data;
-          Storage.setKey(json.key)
+          
           if (json.result.toLowerCase() == 'false') {
-            if (json.errmsg == '超时') {
-              this.$alert('key超时','超时', {
-                confirmButtonText: '确定',
-                callback: action => {
-                  this.$router.push('/login')
-                }
-              });
-              return false;
+            if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
+                this.$alert('与服务器断开连接',json.errmsg, {
+                  confirmButtonText: '确定',
+                  callback: action => {
+                    this.$router.push('/login')
+                  }
+                });
+                return false;
             } else if (json.errmsg) {
               this.$message.warning(json.errmsg)
               return false;
@@ -205,6 +205,7 @@
               return false;
             }
           } else {
+            Storage.setKey(json.key)
             this.searchList();
             this.isShowNewServer=false
           }
@@ -227,16 +228,15 @@
         }).then(res=>{
           this.loading=false;
           var json=res.data;
-          Storage.setKey(json.key)
           if (json.result.toLowerCase() == 'false') {
-            if (json.errmsg == '超时') {
-              this.$alert('key超时','超时', {
-                confirmButtonText: '确定',
-                callback: action => {
-                  this.$router.push('/login')
-                }
-              });
-              return false;
+            if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
+                this.$alert('与服务器断开连接',json.errmsg, {
+                  confirmButtonText: '确定',
+                  callback: action => {
+                    this.$router.push('/login')
+                  }
+                });
+                return false;
             } else if (json.errmsg) {
               this.$message.warning(json.errmsg)
               return false;
@@ -245,6 +245,7 @@
               return false;
             }
           } else {
+            Storage.setKey(json.key)
             this.serverTableList=json.data;
             this.total=Number(json.recordCount);
           }
@@ -276,10 +277,10 @@
             opr:'DeleteFolderServer'
           }).then(res=>{
             var json=res.data;
-            Storage.setKey(json.key)
+            
             if (json.result.toLowerCase() == 'false') {
-              if (json.errmsg == '超时') {
-                this.$alert('key超时','超时', {
+              if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
+                this.$alert('与服务器断开连接',json.errmsg, {
                   confirmButtonText: '确定',
                   callback: action => {
                     this.$router.push('/login')
@@ -294,6 +295,7 @@
                 return false;
               }
             } else {
+              Storage.setKey(json.key)
               this.serverTableList.splice(index,1);
             }
             this.$message({

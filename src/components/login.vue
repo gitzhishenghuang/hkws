@@ -70,12 +70,12 @@
             this.$message.error(res.data.errmsg);
             return
           }
-          Storage.set('LoginInfo',res.data);
-          //Storage.set('userType',this.userType);
-          if(this.userType==1)
-            this.$router.push('/user')
-          else
-            this.$router.push('/admin/dirAdmin')
+           Storage.set('LoginInfo',res.data);
+           //Storage.set('userType',this.userType);
+           if(this.userType==1)
+             this.$router.push('/user')
+           else
+             this.$router.push('/admin/dirAdmin')
         }).catch(err=>{
           this.$message.error('数据错误');
           this.loading=false;

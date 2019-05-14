@@ -81,14 +81,14 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="(item,index) in adminTableList" :key="item.Name">
+                <tr v-for="(item,index) in adminTableList" :key="item.FileServerName">
                   <td>{{item.Name||'-'}}</td>
                   <td>{{item.Path||'-'}}</td>
                   <td>{{item.Space?item.Space+'GB':''||'-'}}</td>
                   <td>{{item.UserName||'-'}}</td>
                   <td>{{item.FileServerName||'-'}}</td>
-                  <td>{{item.CreateTime||'-'}}</td>
-                  <td>{{item.ModifyTime||'-'}}</td>
+                  <td>{{item.CreateTime.replace('+',' ')||'-'}}</td>
+                  <td>{{item.ModifyTime.replace('+',' ')||'-'}}</td>
                   <td>{{item.Validity||'-'}}</td>
                   <td>
                     <!--<a href="javascript:void(0)" @click="showLookOverDiv(item.ID)">查看</a>-->
@@ -205,7 +205,7 @@
         opr:'GetSpaceList'
       })]).then(this.$http.spread((FileServerList,GetSpaceList)=>{
         var json1=FileServerList.data;
-        Storage.setKey(json1.key)
+        //Storage.setKey(json1.key)
         if (json1.result.toLowerCase() == 'false') {
           if (json1.errmsg == '超时') {
             this.$alert('key超时','超时', {
@@ -228,7 +228,7 @@
         }
 
         var json2=GetSpaceList.data;
-        Storage.setKey(json2.key)
+        //Storage.setKey(json2.key)
         if (json2.result.toLowerCase() == 'false') {
           if (json2.errmsg == '超时') {
             this.$alert('key超时','超时', {
@@ -250,7 +250,7 @@
           this.sizeValue=json2.data.length?json2.data[0].Space:''
         }
       })).then(()=>{
-        this.QueryAllFolderList()
+        this.GetFolderList()
       }).catch(err=>{
         this.$message.error('数据错误');
       });
@@ -394,7 +394,7 @@
         this.now=that;
         this.currentPage=1;
         this.isAllList=true;
-        this.QueryAllFolderList();
+        this.QueryFolderList();
         if(that==0){
           this.isPastDue=false
         }else{
@@ -405,7 +405,8 @@
         console.log(`每页 ${val} 条`);
       },
       handleCurrentChange(val) {
-        this.isAllList?this.GetFolderList():this.QueryAllFolderList();
+        //this.isAllList?this.GetFolderList():this.QueryAllFolderList();
+        this.GetFolderList()
       },
       // addDir(){
       //   this.showNewDir=true;
@@ -450,20 +451,20 @@
         }).then(res=>{
           this.loading=false;
           var json=res.data;
-          Storage.setKey(json.key)
           if (json.result.toLowerCase() == 'false') {
-            if (json.errmsg == '超时') {
-              this.$alert('key超时','超时', {
-                confirmButtonText: '确定',
-                callback: action => {
-                  this.$router.push('/login')
-                }
-              });
-              return false;
+            if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
+                this.$alert('与服务器断开连接',json.errmsg, {
+                  confirmButtonText: '确定',
+                  callback: action => {
+                    this.$router.push('/login')
+                  }
+                });
+                return false;
             } else if (json.errmsg) {
               this.$message.warning(json.errmsg)
               return false;
             } else {
+              Storage.setKey(json.key)
               this.$message.warning('数据异常')
               return false;
             }
@@ -471,7 +472,7 @@
             this.currentPage=Number(json.pageIndex)
             this.total=Number(json.recordCount)
             this.adminTableList=json.data
-
+            Storage.setKey(json.key)
           }
 
         }).catch(err=>{
@@ -494,16 +495,16 @@
       }).then(res=>{
         this.loading=false;
         var json=res.data;
-        Storage.setKey(json.key)
+        
         if (json.result.toLowerCase() == 'false') {
-          if (json.errmsg == '超时') {
-            this.$alert('key超时','超时', {
-              confirmButtonText: '确定',
-              callback: action => {
-                this.$router.push('/login')
-              }
-            });
-            return false;
+          if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
+                this.$alert('与服务器断开连接',json.errmsg, {
+                  confirmButtonText: '确定',
+                  callback: action => {
+                    this.$router.push('/login')
+                  }
+                });
+                return false;
           } else if (json.errmsg) {
             this.$message.warning(json.errmsg)
             return false;
@@ -512,6 +513,7 @@
             return false;
           }
         } else {
+          Storage.setKey(json.key)
           this.currentPage=Number(json.pageIndex)
           this.total=Number(json.recordCount)
           this.adminTableList=json.data
@@ -540,16 +542,15 @@
           opr:'DeleteFolder'
         }).then(res=>{
           var json=res.data;
-          Storage.setKey(json.key)
           if (json.result.toLowerCase() == 'false') {
-            if (json.errmsg == '超时') {
-              this.$alert('key超时','超时', {
-                confirmButtonText: '确定',
-                callback: action => {
-                  this.$router.push('/login')
-                }
-              });
-              return false;
+            if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
+                this.$alert('与服务器断开连接',json.errmsg, {
+                  confirmButtonText: '确定',
+                  callback: action => {
+                    this.$router.push('/login')
+                  }
+                });
+                return false;
             } else if (json.errmsg) {
               this.$message.warning(json.errmsg)
               return false;
@@ -558,6 +559,7 @@
               return false;
             }
           } else {
+            Storage.setKey(json.key)
             this.adminTableList.splice(index,1)
             this.total--
           }
