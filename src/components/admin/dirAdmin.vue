@@ -18,14 +18,14 @@
           </div>
           <div style="margin-bottom: 10px;">
             文件夹名称　<input class="dirName" type="text" placeholder="请输入文件夹名称">
-            文件夹大小　<el-select v-model="sizeValue" placeholder="请选择"  style="margin-right: 20px">
+            <!--文件夹大小　<el-select v-model="sizeValue" placeholder="请选择"  style="margin-right: 20px">
             <el-option
               v-for="item in options"
               :key="item.Space"
               :label="item.SpaceName"
               :value="item.Space">
             </el-option>
-          </el-select>
+          </el-select>-->
             所属人　<input v-model.trim="people" class="dirName" type="text" style="width: 180px" placeholder="关键字">
           </div>
           <div style="margin-bottom: 15px;">
@@ -38,7 +38,7 @@
               >
             </el-option>
           </el-select>
-            创建时间　<el-date-picker
+           <!-- 创建时间　<el-date-picker
             v-model="dateValue"
             type="daterange"
             range-separator="-"
@@ -48,15 +48,15 @@
             value-format="yyyy-MM-dd HH:mm:ss"
             :picker-options="pickerOptions"
             :clearable="clearable">
-          </el-date-picker>
-            有效期　<el-select v-model="deadlineValue" placeholder="请选择">
+          </el-date-picker>-->
+            <!--有效期　<el-select v-model="deadlineValue" placeholder="请选择">
             <el-option
               v-for="item in options2"
               :key="item.value"
               :label="item.label"
               :value="item.value">
             </el-option>
-          </el-select>
+          </el-select>-->
             <el-button @click="GetFolderList('reset')" style="margin-left: 32px">搜索</el-button>
           </div>
           <div>
@@ -81,7 +81,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="(item,index) in adminTableList" :key="item.FileServerName">
+                <tr v-for="(item,index) in adminTableList" :key="item.CreateTime">
                   <td>{{item.Name||'-'}}</td>
                   <td>{{item.Path||'-'}}</td>
                   <td>{{item.Space?item.Space+'GB':''||'-'}}</td>
@@ -92,8 +92,8 @@
                   <td>{{item.Validity||'-'}}</td>
                   <td>
                     <!--<a href="javascript:void(0)" @click="showLookOverDiv(item.ID)">查看</a>-->
-                    <a href="javascript:void(0)" @click="editFolder(item.ID)">编辑</a>
-                    <a href="javascript:void(0)" @click="DeleteFolder(item.ID,index)">| 删除</a>
+                    <a href="javascript:void(0)" :class="{'gray':item.state==0}" @click="editFolder(item.ID,item.state)">编辑</a>
+                    <a href="javascript:void(0)" :class="{'gray':item.state==0}" @click="DeleteFolder(item.ID,index,item.state)">| 删除</a>
                   </td>
                 </tr>
                 </tbody>
@@ -190,11 +190,11 @@
   export default {
     name: 'dirAdmin',
     mounted(){
-      var date=new Date();
+      /*var date=new Date();
       var yy=date.getFullYear(),
         MM=date.getMonth()+1,
         dd=date.getDate()
-      this.dateValue=[yy+'-'+MM+'-'+dd+' 00:00:00',yy+'-'+MM+'-'+dd+' 23:59:59'];
+      this.dateValue=[yy+'-'+MM+'-'+dd+' 00:00:00',yy+'-'+MM+'-'+dd+' 23:59:59'];*/
       this.$http.all([this.$http.post('',{
         strCurrentTime:Storage.get('LoginInfo').key,
         LoginUser:Storage.get('LoginInfo').Account,
@@ -226,7 +226,7 @@
           this.fileServerOptions=json1.data
           this.fileServer=json1.data.length?json1.data[0].ID:''
         }
-
+        return
         var json2=GetSpaceList.data;
         //Storage.setKey(json2.key)
         if (json2.result.toLowerCase() == 'false') {
@@ -394,7 +394,7 @@
         this.now=that;
         this.currentPage=1;
         this.isAllList=true;
-        this.QueryFolderList();
+        this.GetFolderList();
         if(that==0){
           this.isPastDue=false
         }else{
@@ -437,11 +437,11 @@
           strCurrentTime:Storage.get('LoginInfo').key,
           KeyWord:this.dirName,
           Account:this.people,
-          Space:this.sizeValue,
-          BeginTime:this.dateValue[0],
-          EndTime:this.dateValue[1],
-          LocalPath:this.serverLocalPath,
-          Validity:this.deadlineValue,
+          //Space:this.sizeValue,
+          //BeginTime:this.dateValue[0],
+          //EndTime:this.dateValue[1],
+          //LocalPath:this.serverLocalPath,
+          //Validity:this.deadlineValue,
           FileServerID:this.fileServer,
           Type:this.now==0?0:1,
           PageIndex:this.currentPage,
@@ -524,7 +524,11 @@
       })
     },
       //编辑
-      editFolder(id){
+      editFolder(id,state){
+        if(state==0){
+          this.$message.warning('此文件处于操作中，请10分钟后重试');
+          return
+        }
         this.showEditDir=true;
         this.dirID=id
       },
@@ -534,16 +538,24 @@
         }
       },
       //删除
-      DeleteFolder(id,index){
-        this.$http.post('',{
-          strCurrentTime:Storage.get('LoginInfo').key,
-          FolderID:id,
-          LoginUser:Storage.get('LoginInfo').Account,
-          opr:'DeleteFolder'
-        }).then(res=>{
-          var json=res.data;
-          if (json.result.toLowerCase() == 'false') {
-            if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
+      DeleteFolder(id,index,state){
+        if(state==0){
+          this.$message.warning('此文件处于操作中，请10分钟后重试');
+          return
+        }
+        this.$confirm('确定删除吗?','删除后数据无法恢复', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消'
+        }).then(()=>{
+          this.$http.post('',{
+            strCurrentTime:Storage.get('LoginInfo').key,
+            FolderID:id,
+            LoginUser:Storage.get('LoginInfo').Account,
+            opr:'DeleteFolder'
+          }).then(res=>{
+            var json=res.data;
+            if (json.result.toLowerCase() == 'false') {
+              if (json.errmsg == '超时'||json.errmsg == '验证失败请求非法') {
                 this.$alert('与服务器断开连接',json.errmsg, {
                   confirmButtonText: '确定',
                   callback: action => {
@@ -551,21 +563,37 @@
                   }
                 });
                 return false;
-            } else if (json.errmsg) {
-              this.$message.warning(json.errmsg)
-              return false;
+              } else if (json.errmsg) {
+                this.$message.warning(json.errmsg)
+                return false;
+              } else {
+                this.$message.warning('数据异常')
+                return false;
+              }
             } else {
-              this.$message.warning('数据异常')
-              return false;
+              Storage.setKey(json.key)
+              this.adminTableList.splice(index,1)
+              this.total--
+              if(this.adminTableList==0){
+                this.currentPage=parseInt(this.total/10);
+                if(this.currentPage==0){
+                  return
+                }
+                this.GetFolderList();
+              }
             }
-          } else {
-            Storage.setKey(json.key)
-            this.adminTableList.splice(index,1)
-            this.total--
-          }
-
-        }).catch(err=>{
-          this.$message.error('数据错误');
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            });
+          }).catch(err=>{
+            this.$message.error('数据错误');
+          })
+        }).catch(()=>{
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });
         })
       },
     }
@@ -574,6 +602,9 @@
 </script>
 
 <style  lang="scss" scoped>
+  .gray{
+    color: #ccc;
+  }
   .el-container{
     height: 100%;
     /*height: calc(100% - 69px);*/

@@ -83,9 +83,9 @@
                       <td>{{item.Validity||'-'}}</td>
                       <td>
                         <!--<a href="javascript:void(0)" @click="showLookOverDiv(item.ID)">查看</a>-->
-                        <a href="javascript:void(0)" @click="editFolder(item.ID)">编辑</a>
-                        <a href="javascript:void(0)" @click="DeleteFolder(item.ID,index)">| 删除</a>
-                        <a href="javascript:void(0)" @click="showRenewalDiv(item.ID,item.Name,item.Validity,item.DueToTime,item.FileServerName)">| 续期</a>
+                        <a href="javascript:void(0)" :class="{'gray':item.state==0}" @click="editFolder(item.ID,item.state)">编辑</a>
+                        <a href="javascript:void(0)" :class="{'gray':item.state==0}" @click="DeleteFolder(item.ID,index,item.state)">| 删除</a>
+                        <a href="javascript:void(0)" :class="{'gray':item.state==0}" @click="showRenewalDiv(item.ID,item.Name,item.Validity,item.DueToTime,item.FileServerName,item.state)">| 续期</a>
                       </td>
                     </tr>
                   </tbody>
@@ -327,7 +327,11 @@ export default {
     },
 
     //续期
-    showRenewalDiv(id,dirName,Validity,DueToTime,ServerName){
+    showRenewalDiv(id,dirName,Validity,DueToTime,ServerName,state){
+      if(state==0){
+        this.$message.warning('此文件处于操作中，请10分钟后重试');
+        return
+      }
       this.FolderID=id
       this.modalDirName=dirName
       this.renewalDay=Number(Validity)
@@ -380,7 +384,11 @@ export default {
     },
 
     //编辑
-    editFolder(id){
+    editFolder(id,state){
+      if(state==0){
+        this.$message.warning('此文件处于操作中，请10分钟后重试');
+        return
+      }
       this.showEditDir=true;
       this.FolderID=id;
     },
@@ -391,8 +399,12 @@ export default {
       this.FolderID=id
     },
     //删除
-    DeleteFolder(id,index){
-      this.$confirm('此操作将永久删除, 是否继续?', '提示', {
+    DeleteFolder(id,index,state){
+      if(state==0){
+        this.$message.warning('此文件处于操作中，请10分钟后重试');
+        return
+      }
+      this.$confirm('确定删除吗?', '删除后数据无法恢复', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -423,7 +435,14 @@ export default {
           } else {
             Storage.setKey(json.key)
             this.userTableList.splice(index,1)
-            this.total--
+            this.total--;
+            if(this.userTableList==0){
+              this.currentPage=parseInt(this.total/10);
+              if(this.currentPage==0){
+                return
+              }
+              this.QueryAllFolderList();
+            }
             this.$message({
               type: 'success',
               message: '删除成功!'
@@ -559,6 +578,9 @@ export default {
 </script>
 
 <style  lang="scss" scoped>
+  .gray{
+    color: #ccc;
+  }
 .el-container{
   height: 100%;
   /*height: calc(100% - 69px);*/

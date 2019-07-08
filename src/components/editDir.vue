@@ -374,6 +374,7 @@
           }
 
         }).catch(err=>{
+          console.log(err);
           this.$message.error('数据错误');
         })
       }
