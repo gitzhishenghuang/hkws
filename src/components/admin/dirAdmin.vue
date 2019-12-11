@@ -707,6 +707,7 @@
       }
 
       .tabs textarea{
+
         display: block;
         resize: none;
         border: 1px solid #dcdfe6;

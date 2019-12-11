@@ -649,6 +649,7 @@
   }
   .editListBox{
     border: 1px solid #f4f4f5;
+    height: 320px;
     overflow-y: scroll;
   }
   .editListBox ul{
@@ -660,6 +661,7 @@
   height: 26px;
   line-height: 26px;
   padding:0 10px;
+  word-break: break-all;
 }
 .editListBox ul li i{
   line-height: 26px;
